@@ -14,7 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Profile("!File")
+@Profile("!file")
 public class DBUserService implements UserServiceInter {
 
     private final UserRepo userRepo;

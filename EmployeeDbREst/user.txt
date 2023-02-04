@@ -1,0 +1,18 @@
+ {
+        "id": 2,
+        "username": "niko",
+        "password": "12345",
+        "active": true,
+        "roles": [
+            "SUPERVISOR"
+        ]
+    }
+    {
+            "id": 1,
+            "username": "nihad",
+            "password": "12345",
+            "active": true,
+            "roles": [
+                "ADMIN"
+            ]
+        }
