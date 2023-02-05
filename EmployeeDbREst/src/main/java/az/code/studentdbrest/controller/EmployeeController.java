@@ -104,11 +104,7 @@ public class EmployeeController {
         return ResponseEntity.ok(userServiceInter.getAllUsers());
 
     }
-    @GetMapping("/users/{id}")
-    @Secured("ROLE_USER")
-    public ResponseEntity<UserDto> getUser(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(objectMapper.convertValue(userServiceInter.getById(id), UserDto.class));
-    }
+
 
 }
 

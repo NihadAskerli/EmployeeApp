@@ -41,9 +41,4 @@ public class FileUserService implements UserServiceInter {
         return list;
     }
 
-    @Override
-    public User getById(Long id) {
-
-        return null;
-    }
 }

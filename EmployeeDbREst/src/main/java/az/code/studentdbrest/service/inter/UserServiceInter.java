@@ -10,5 +10,4 @@ public interface UserServiceInter {
     User addUser(User user) throws IOException;
 
     List<User> getAllUsers() throws IOException;
-    User getById(Long id);
 }

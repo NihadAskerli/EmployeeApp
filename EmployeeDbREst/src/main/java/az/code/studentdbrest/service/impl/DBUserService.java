@@ -30,11 +30,4 @@ public class DBUserService implements UserServiceInter {
     public List<User> getAllUsers() {
         return userRepo.findAll();
     }
-
-    @Override
-    public User getById(Long id) {
-        return userRepo.findById(id).get();
-    }
-
-
 }

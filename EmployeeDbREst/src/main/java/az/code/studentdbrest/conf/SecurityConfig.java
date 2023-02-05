@@ -1,42 +1,54 @@
 package az.code.studentdbrest.conf;
 
-import az.code.studentdbrest.models.Role;
-import az.code.studentdbrest.repo.UserRepo;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import java.util.EnumSet;
-import java.util.function.IntFunction;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@EnableGlobalMethodSecurity(
-        prePostEnabled = true,
-        securedEnabled = true,
-        jsr250Enabled = true)
 @Slf4j
+@EnableWebSecurity
+@RequiredArgsConstructor
+@Profile("prod")
 public class SecurityConfig {
 
-@Bean
-public BCryptPasswordEncoder passwordEncoder(){
-    return new BCryptPasswordEncoder();
-}
-    @Bean
-    public UserDetailsService userDetailsService( UserRepo userRepo) {
-        return username -> {
-            return userRepo.findByUsernameAndAndActiveIsTrue(username).map(user -> User.builder()
-                    .username(user.getUsername())
-                    .password(user .getPassword())
-                    .roles(user.getRoles().stream().map(Role::toString).toArray(String[]::new))
-                    .build()).orElseThrow(() -> new UsernameNotFoundException("Not found"));
-        };
-    }
+        private final JwtAuthenticationFilter jwtAuthFilter;
+
+        private final AuthenticationProvider authenticationProvider;
+
+
+        @Bean
+        public BCryptPasswordEncoder bCryptPasswordEncoder(){
+            return new BCryptPasswordEncoder();
+        }
+
+        @Bean
+        SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+            httpSecurity
+                    .csrf().disable()
+                    .authorizeHttpRequests()
+                    .requestMatchers("/auth/v1/check/**")
+                    .permitAll()
+                    .anyRequest().authenticated()
+                    .and()
+                    .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                    .authenticationProvider(authenticationProvider)
+                    .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+            return httpSecurity.build();
+        }
+
 
 
 }
