@@ -2,19 +2,15 @@ package az.code.studentdbrest.controller;
 
 import az.code.studentdbrest.dto.EmployeeDto;
 import az.code.studentdbrest.dto.TaskDto;
-import az.code.studentdbrest.dto.UserDto;
 import az.code.studentdbrest.models.Employee;
 import az.code.studentdbrest.models.Task;
-import az.code.studentdbrest.models.User;
 import az.code.studentdbrest.service.inter.EmployeeAndTaskServiceInter;
-import az.code.studentdbrest.service.inter.UserServiceInter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -23,7 +19,6 @@ import java.util.List;
 public class EmployeeController {
     private final ObjectMapper objectMapper;
  private final EmployeeAndTaskServiceInter employeeAndTaskServiceInter;
-    private final UserServiceInter userServiceInter;
 
 
     @PostMapping
@@ -90,19 +85,9 @@ public class EmployeeController {
                 .convertValue(employeeAndTaskServiceInter
                         .saveTask(objectMapper.convertValue(taskDto, Task.class)),TaskDto.class));
     }
-    @PostMapping("/users")
-    @Secured("ROLE_USER")
-    public ResponseEntity<UserDto> saveUser(@RequestBody UserDto userDto) throws IOException {
-        return ResponseEntity.ok(objectMapper
-                .convertValue(userServiceInter.addUser(objectMapper.convertValue(userDto, User.class))
-                        , UserDto.class));
-
-    }
-    @GetMapping("/users")
-    @Secured("ROLE_SUPERVISOR")
-    public ResponseEntity<List> getUser() throws IOException {
-        return ResponseEntity.ok(userServiceInter.getAllUsers());
-
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        return ResponseEntity.ok("basardin");
     }
 
 

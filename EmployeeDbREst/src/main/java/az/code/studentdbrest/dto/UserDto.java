@@ -1,19 +1,13 @@
 package az.code.studentdbrest.dto;
 
-import az.code.studentdbrest.models.Role;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
 
-import java.util.List;
 @Data
-@Builder
-@ToString(exclude = "roles")
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDto {
-    private Long id;
     private String username;
     private String password;
-    private boolean active;
-    private RoleDto roles;
-
 }

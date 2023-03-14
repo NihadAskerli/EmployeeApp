@@ -1,34 +1,37 @@
 package az.code.studentdbrest.controller;
 
-
-import az.code.studentdbrest.conf.auth.AuthenticationRequest;
-import az.code.studentdbrest.conf.auth.AuthenticationResponse;
-import az.code.studentdbrest.conf.auth.RegisterRequest;
+import az.code.studentdbrest.dto.UserDto;
+import az.code.studentdbrest.models.LoginRequest;
+import az.code.studentdbrest.models.LoginResponse;
+import az.code.studentdbrest.models.UserEntity;
 import az.code.studentdbrest.service.impl.AuthService;
+import az.code.studentdbrest.service.impl.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth/v1/check")
 public class AuthController {
-
-    private final AuthService service;
-
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody RegisterRequest request
-    ) {
-        return ResponseEntity.ok(service.register(request));
+    @Autowired
+    UserService userService;
+    private final AuthService authService;
+    private final ObjectMapper objectMapper;
+    @PostMapping("/auth/login")
+    public LoginResponse login(@RequestBody @Validated LoginRequest loginRequest) {
+        return authService.loginResponse(loginRequest.getEmail(), loginRequest.getPassword());
     }
-    @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request
-    ) {
-        return ResponseEntity.ok(service.authenticate(request));
+    @PostMapping("/auth/register")
+    public ResponseEntity<UserDto> register(@RequestBody UserDto user) {
+       UserEntity userEntity= objectMapper.convertValue(user,UserEntity.class);
+        System.out.println(user);
+        System.out.println(userEntity);
+        userService.saveUser(userEntity);
+        return ResponseEntity.ok(user);
     }
 }

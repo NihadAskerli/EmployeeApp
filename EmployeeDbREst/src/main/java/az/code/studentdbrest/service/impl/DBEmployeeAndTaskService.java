@@ -6,7 +6,6 @@ import az.code.studentdbrest.repo.EmployeeDataRepo;
 import az.code.studentdbrest.repo.TaskDataRepo;
 import az.code.studentdbrest.service.inter.EmployeeAndTaskServiceInter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -15,7 +14,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Profile("!Memory")
 public class DBEmployeeAndTaskService implements EmployeeAndTaskServiceInter {
     private final EmployeeDataRepo employeeDataRepo;
     private final TaskDataRepo taskDataRepo;

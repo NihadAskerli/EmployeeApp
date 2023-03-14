@@ -1,49 +1,33 @@
 package az.code.studentdbrest.service.impl;
 
-import az.code.studentdbrest.conf.auth.AuthenticationRequest;
-import az.code.studentdbrest.conf.auth.AuthenticationResponse;
-import az.code.studentdbrest.conf.auth.RegisterRequest;
-import az.code.studentdbrest.models.Role;
-import az.code.studentdbrest.models.User;
-import az.code.studentdbrest.repo.UserRepo;
+
+import az.code.studentdbrest.config.JWTIssuer;
+import az.code.studentdbrest.config.UserPrinciple;
+import az.code.studentdbrest.models.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepo userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
-
+    private final JWTIssuer jwtIssuer;
     private final AuthenticationManager authenticationManager;
+    public LoginResponse loginResponse(String username, String password){
+        var authetication=authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username,
+                password));
+        SecurityContextHolder.getContext().setAuthentication(authetication);
+        var principal=(UserPrinciple)authetication.getPrincipal();
+        var roles=principal.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
 
-    public AuthenticationResponse register(RegisterRequest registerRequest){
-        User user = User.builder()
-                .username(registerRequest.getUsername())
-                .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .active(true)
-                .role(Role.ADMIN)
+        var token=jwtIssuer.issue(principal.getUserId(),principal.getEmail(), roles);
+        return LoginResponse.builder()
+                .accessToken(token)
                 .build();
-        userRepository.save(user);
-        String jwtToken = jwtService.generateToken(user);
-
-        return AuthenticationResponse.builder().token(jwtToken).build();
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest registerRequest){
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        registerRequest.getUsername(),
-                        registerRequest.getPassword()
-                )
-        );
-        User user = userRepository.findByUsernameAndAndActiveIsTrue(registerRequest.getUsername());
-        String jwtToken = jwtService.generateToken(user);
-        return  AuthenticationResponse.builder().token(jwtToken).build();
-    }
 }
